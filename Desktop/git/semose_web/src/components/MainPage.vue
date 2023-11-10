@@ -24,11 +24,19 @@
               <b-button size="lg" 
               style="font-size: 30px; font-weight: bold; margin: 20px 0;"
               variant="info"
-              @click="onClickGetData"
+              @click="sendDataToServer"
               >START
               </b-button>
             </b-col>
 
+            <b-col class="pb-2" >
+              <b-button size="lg" 
+              style="font-size: 30px; font-weight: bold; margin: 20px 0;"
+              variant="info"
+              @click="onClickGetData"
+              >START
+              </b-button>
+            </b-col>
           <div>
             data : {{data}}
           </div>
@@ -73,7 +81,7 @@ export default {
   methods: {
     onClickGetData() {
       axios
-        .get(`http://localhost:8000/api/test`, {})
+        .get(`http://localhost:8000/api/end`, {})
         .then((res) => {
           console.log("---axios Get 성공---- ");
           this.data = res.data;
@@ -89,6 +97,35 @@ export default {
     onUpdateStore(newStore) {
       // 하위 컴포넌트에서 전달된 새로운 주소 값을 상위 컴포넌트의 데이터에 적용
       this.post_data.selected = newStore;
+    },
+    sendDataToServer() {
+      axios
+        .post(`http://localhost:8000/api/end`, {
+          address: this.post_data.address,
+          selected: JSON.stringify(this.post_data.selected),
+        })
+        .then((res) => {
+          console.log("---axios Post 성공---- ");
+          this.data = res.data;
+        })
+        .catch((res) => {
+          console.error(res);
+        });
+      this.sendLogToServer();
+    },
+    sendLogToServer() {
+      axios
+      .post('http://localhost:8000/api/log', {
+        address: this.post_data.address,
+        selected: JSON.stringify(this.post_data.selected),
+      })
+      .then((res) => {
+        console.log('Data posted successfully');
+        this.data = res.data;
+      })
+      .catch((res) => {
+        console.error('Error posting data:', res);
+      });
     },
   },
 };

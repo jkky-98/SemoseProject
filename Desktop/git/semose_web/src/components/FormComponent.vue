@@ -76,7 +76,25 @@
           { text: '스타벅스', value: '스타벅스' },
           { text: '맥도날드', value: '맥도날드' },
           { text: '메가커피', value: '메가MGC커피' },
-          { text: '편의점', value: '편의점' }
+          { text: '편의점', value: '편의점' },
+          { text: '올리브영', value: '올리브영' },
+          { text: '슈퍼', value: '슈퍼' },
+          { text: '코인노래방', value: '코인노래방' },
+          { text: '필라테스', value: '필라테스' },
+          { text: '헬스장', value: '헬스장' },
+          { text: '은행', value: '은행' },
+          { text: '스터디카페', value: '스터디카페' },
+          { text: '인쇄', value: '인쇄' },
+          { text: '공원', value: '공원' },
+          { text: '약국', value: '약국' },
+          { text: '내과', value: '내과' },
+          { text: '한의원', value: '한의원' },
+          { text: '우체국', value: '우체국' },
+          { text: '배스킨라빈스', value: '배스킨라빈스' },
+          { text: '교보문고', value: '교보문고' },
+          { text: '아주대학교', value: '아주대학교' },
+
+    
         ],
         selected: null,
         selected_list: [],
@@ -145,6 +163,8 @@
       },
       updateStore() {
         this.$emit("onUpdateStore", this.selected_list);
+        this.resetSelected();
+        this.dataAddress = "";
       },
   },
     props: {

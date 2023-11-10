@@ -1,0 +1,9 @@
+[
+    { "text": "Select", "value": null , "id": null},
+    { "text": "스타벅스", "value": "스타벅스" , "id":"카페"},
+    { "text": "맥도날드", "value": "맥도날드", "id":"햄버거" },
+    { "text": "메가커피", "value": "메가MGC커피", "id":"카페"},
+    { "text": "편의점", "value": "편의점" , "id":"편의점"},
+    { "text": "버거킹", "value": "버거킹" , "id":},
+
+  ]
