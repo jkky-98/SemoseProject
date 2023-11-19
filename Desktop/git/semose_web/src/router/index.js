@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainPage from '../components/MainPage.vue'
 import Intro from '../components/Intro.vue'
+import MapComponent from '../components/MapComponent.vue'
 
 const routes = [
   {
@@ -13,6 +14,11 @@ const routes = [
     name: 'MainPageComponent',
     component: MainPage
   },
+  {
+    path: '/test',
+    name: 'MapComponent',
+    component: MapComponent
+  }
 ]
 
 const router = createRouter({

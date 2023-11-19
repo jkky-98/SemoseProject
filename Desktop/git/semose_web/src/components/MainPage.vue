@@ -6,11 +6,6 @@
 
           <div>
         <!-- 주소 입력 컴포넌트를 상위 컴포넌트에서 사용 -->
-            <address-component @onUpdateAddress="onUpdateAddress">
-            </address-component>
-
-            <address-search @onUpdateAddress="onUpdateAddress">
-            </address-search>
           <div>
             입력된 주소 : {{post_data.address}}
           </div>
@@ -20,27 +15,12 @@
             >
             </form-component>
           <div>
-            <b-col class="pb-2" >
-              <b-button size="lg" 
-              style="font-size: 30px; font-weight: bold; margin: 20px 0;"
-              variant="info"
-              @click="sendDataToServer"
-              >START
-              </b-button>
-            </b-col>
 
-            <b-col class="pb-2" >
-              <b-button size="lg" 
-              style="font-size: 30px; font-weight: bold; margin: 20px 0;"
-              variant="info"
-              @click="onClickGetData"
-              >START
-              </b-button>
-            </b-col>
           <div>
             data : {{data}}
           </div>
-
+          <kakao-map :parentData="data">
+          </kakao-map>
           </div>
       </div>
       <div class="right-column">
@@ -55,21 +35,25 @@
 <script>
 
 import axios from "axios";
-import Address from './Address.vue';
-import AddressSearch from './AddressSearch.vue';
 import FormComponent from './FormComponent.vue';
-
+import MapComponent from './MapComponent.vue';
 
 
 export default {
   components : {
-    'address-component': Address,
-    'address-search': AddressSearch,
     'form-component': FormComponent,
+    'kakao-map': MapComponent,
   },
   data() {
     return {
-      data: null,
+      data: {
+        scorebox : null,
+        info_store : [
+          { name: "스타벅스", lat: 37.2796352, lng: 127.043346 },
+          { name: "Burger King", lat: 37.2745815, lng: 127.045215 },
+          { name: "Daiso", lat: 37.2754895, lng: 127.0423236 },
+        ]
+      },
       address: '',
       selected: [],
       post_data:{
@@ -79,17 +63,26 @@ export default {
     };
   },
   methods: {
-    onClickGetData() {
-      axios
-        .get(`http://localhost:8000/api/end`, {})
-        .then((res) => {
-          console.log("---axios Get 성공---- ");
-          this.data = res.data;
-        })
-        .catch((res) => {
-          console.error(res);
-        });
-    },
+    onGetData() {
+    axios
+      .get(`http://localhost:8000/api/end`, {})
+      .then((res) => {
+        console.log("---axios Get 성공---- ");
+        const receivedData = res.data;
+
+        // 받은 데이터를 Vue 데이터 형식에 맞게 가공
+        const processedData = {
+          scorebox: receivedData.scorebox,
+          info_store: JSON.parse(receivedData.info_store)
+        };
+
+        // Vue 데이터에 할당
+        this.data = processedData;
+      })
+      .catch((res) => {
+        console.error(res);
+      });
+  },
     onUpdateAddress(newAddress) {
       // 하위 컴포넌트에서 전달된 새로운 주소 값을 상위 컴포넌트의 데이터에 적용
       this.post_data.address = newAddress;
@@ -97,6 +90,7 @@ export default {
     onUpdateStore(newStore) {
       // 하위 컴포넌트에서 전달된 새로운 주소 값을 상위 컴포넌트의 데이터에 적용
       this.post_data.selected = newStore;
+      this.fullRequest()
     },
     sendDataToServer() {
       axios
@@ -106,7 +100,7 @@ export default {
         })
         .then((res) => {
           console.log("---axios Post 성공---- ");
-          this.data = res.data;
+          console.log(res.data)
         })
         .catch((res) => {
           console.error(res);
@@ -127,6 +121,11 @@ export default {
         console.error('Error posting data:', res);
       });
     },
+    fullRequest(){
+      this.sendDataToServer()
+      this.onGetData()
+      this.sendLogToServer()
+    }
   },
 };
 </script>

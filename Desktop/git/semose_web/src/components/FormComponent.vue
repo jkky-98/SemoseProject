@@ -61,9 +61,10 @@
 
   export default {
     name: 'FormComponent',
-
     data() {
       return {
+
+        
         // daum post code data //
         postcode: "",
         dataAddress: "",
@@ -164,7 +165,6 @@
       updateStore() {
         this.$emit("onUpdateStore", this.selected_list);
         this.resetSelected();
-        this.dataAddress = "";
       },
   },
     props: {
