@@ -82,7 +82,6 @@
           { text: '슈퍼', value: '슈퍼' },
           { text: '코인노래방', value: '코인노래방' },
           { text: '필라테스', value: '필라테스' },
-          { text: '헬스장', value: '헬스장' },
           { text: '은행', value: '은행' },
           { text: '스터디카페', value: '스터디카페' },
           { text: '인쇄', value: '인쇄' },
@@ -92,7 +91,6 @@
           { text: '한의원', value: '한의원' },
           { text: '우체국', value: '우체국' },
           { text: '배스킨라빈스', value: '배스킨라빈스' },
-          { text: '교보문고', value: '교보문고' },
           { text: '아주대학교', value: '아주대학교' },
 
     

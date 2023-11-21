@@ -10,11 +10,13 @@
 </template>
 
 <script>
+
 export default {
   name: "KakaoMap",
   data() {
     return {
-      address: { name: "My house", lat: 37.2781534, lng: 127.0427976 },
+      scorebox: null,
+      address: { name: 'my house', lat: 37.0781534, lng: 127.0427976 },
       stores: [
         { name: "Starbucks", lat: 37.2796352, lng: 127.043346 },
         { name: "Burger King", lat: 37.2745815, lng: 127.045215 },
@@ -33,142 +35,142 @@ export default {
     }
   },
   mounted() {
+
     if (window.kakao && window.kakao.maps) {
       this.loadMap();
     } else {
       this.loadScript();
     }
+
   },
   methods: {
-    setData(data) {
-          // 자식 컴포넌트의 데이터를 설정하는 메서드
-          // 이 메서드는 부모 컴포넌트에서 호출됨
-          this.receivedData = data;
-        },
-
-    addHouseMarker() {
-      const { name, lat, lng } = this.address;
-      this.addMarker(name, lat, lng);
-    },
   
     loadScript() {
       const script = document.createElement("script");
       script.src =
-        "https://dapi.kakao.com/v2/maps/sdk.js?appkey=14d78dd0b00ee306c710756383b6e3e7&autoload=false";
+        "https://dapi.kakao.com/v2/maps/sdk.js?appkey=14d78dd0b00ee306c710756383b6e3e7&autoload=false&libraries=services,clusterer,drawing";
+      script.type = 'text/javascript';
       script.onload = () => window.kakao.maps.load(() => this.loadMap());
-
       document.head.appendChild(script);
     },
     loadMap() {
       const container = document.getElementById("map");
+
+      // 맵 기본위치 설정 및 사이즐 
       const options = {
-        center: new window.kakao.maps.LatLng(37.282972, 127.045545),
+        center: new window.kakao.maps.LatLng(this.parentData.address_latlng.lat, this.parentData.address_latlng.lng),
         level: 3,
       };
+      // 기본 맵 띄우기
       this.map = new window.kakao.maps.Map(container, options);
-      this.loadStores(); // Move this line after initializing the map
-      this.addHouseMarker();
+
+      this.$nextTick(() => {
+            this.addSetFull(this.parentData.info_store, 
+            this.parentData.address_latlng, 
+            this.parentData.bus);
+          });
+      // 맵 추가 기능
     },
-    loadStores() {
-      this.parentData.info_store.forEach((store, index) => {
-        const { name, lat, lng } = store;
-        this.addMarker(name, lat, lng, index);
-      });
-    },
-    addMarker(name, lat, lng, index) {
-      const latlng = new window.kakao.maps.LatLng(lat, lng);
-      const marker = new window.kakao.maps.Marker({
-        position: latlng,
-        map: this.map,
-      });
 
-      // Make sure the stores array is initialized
-      if (!this.stores[index]) {
-        this.stores[index] = {};
-      }
+    addMarker(lat, lng) {
+            // 마커가 표시될 위치입니다 
+      var markerPosition  = new window.kakao.maps.LatLng(lat, lng); 
 
-      // Attach the marker to the store object
-      this.stores[index].marker = marker;
-
-      // Add event listener for displaying place name on marker click
-      window.kakao.maps.event.addListener(marker, 'click', () => {
-        this.showPlaceName(name, latlng);
-      });
-    },
-    calculateDistance() {
-      const addressLatLng = new window.kakao.maps.LatLng(this.address.lat, this.address.lng);
-
-      this.stores.forEach((store, index) => {
-        const latlng2 = store.marker.getPosition();
-        this.drawConnectingLine(addressLatLng, latlng2, index);
-      });
-    },
-    drawConnectingLine(latlng1, latlng2, index) {
-      const line = new window.kakao.maps.Polyline({
-        path: [latlng1, latlng2],
-        strokeWeight: 3,
-        strokeColor: "#FF0000",
-        strokeOpacity: 0.7,
-      });
-      line.setMap(this.map);
-
-      const distance = this.calculateDistanceBetween(latlng1, latlng2);
-
-      // Create a content for CustomOverlay
-      const content = `<div style="padding:5px;">Distance: ${distance.toFixed(2)} m</div>`;
-
-      // Attach the content to CustomOverlay
-      const customOverlay = new window.kakao.maps.CustomOverlay({
-        content,
-        position: latlng2,
-        xAnchor: 0.5,
-        yAnchor: -1.5,
+      // 마커를 생성합니다
+      var marker = new window.kakao.maps.Marker({
+          position: markerPosition,
+          clickable: true
       });
 
-      customOverlay.setMap(this.map);
-
-      // Attach the custom overlay to the store object
-      this.stores[index].overlay = customOverlay;
+      // 마커가 지도 위에 표시되도록 설정합니다
+      marker.setMap(this.map);
     },
-    calculateDistanceBetween(latlng1, latlng2) {
-      const rad = Math.PI / 180;
-      const lat1 = latlng1.getLat() * rad;
-      const lng1 = latlng1.getLng() * rad;
-      const lat2 = latlng2.getLat() * rad;
-      const lng2 = latlng2.getLng() * rad;
-      const dlat = lat2 - lat1;
-      const dlng = lng2 - lng1;
-      const a =
-        Math.sin(dlat / 2) ** 2 +
-        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlng / 2) ** 2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const radius = 6371 * 1000; // Earth's radius in meters
-      return radius * c;
-    },
-    showPlaceName(name, latlng) {
-      const content = `<div style="padding:5px;">${name}</div>`;
 
-      // Create an overlay for displaying place name
-      const overlay = new window.kakao.maps.CustomOverlay({
-        content,
-        position: latlng,
-        xAnchor: 0.5,
-        yAnchor: 1.5,
+    addLine(address, lat_end, lng_end, color='#FFAE00') {
+      var linePath = [
+      new window.kakao.maps.LatLng(address.lat, address.lng),
+      new window.kakao.maps.LatLng(lat_end, lng_end)
+      ]
+        // 지도에 표시할 선을 생성합니다
+      var polyline = new window.kakao.maps.Polyline({
+          path: linePath, // 선을 구성하는 좌표배열 입니다
+          strokeWeight: 5, // 선의 두께 입니다
+          strokeColor: color, // 선의 색깔입니다
+          strokeOpacity: 0.7, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+          strokeStyle: 'solid' // 선의 스타일입니다
       });
-
-      overlay.setMap(this.map);
-
-      // Automatically close the overlay after 3 seconds
-      setTimeout(() => {
-        overlay.setMap(null);
-      }, 3000);
+      polyline.setMap(this.map);  
     },
+    customOverlay(lat, lng, name, distance) {
+      var iwContent = name+distance, // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+          iwPosition = new window.kakao.maps.LatLng(lat, lng), //인포윈도우 표시 위치입니다
+          iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+
+      // 인포윈도우를 생성하고 지도에 표시합니다
+      new window.kakao.maps.InfoWindow({
+          map: this.map, // 인포윈도우가 표시될 지도
+          position : iwPosition, 
+          content : iwContent,
+          removable : iwRemoveable
+      });
+    },
+    customOverlay_house(lat, lng) {
+      var iwContent = "my house SCORE : "+ this.parentData.scorebox.score, // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+          iwPosition = new window.kakao.maps.LatLng(lat, lng), //인포윈도우 표시 위치입니다
+          iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+
+      // 인포윈도우를 생성하고 지도에 표시합니다
+      new window.kakao.maps.InfoWindow({
+          map: this.map, // 인포윈도우가 표시될 지도
+          position : iwPosition, 
+          content : iwContent,
+          removable : iwRemoveable
+      });
+    },
+
+    // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+    optionZoomControl() {
+      var zoomControl = new window.kakao.maps.ZoomControl();
+      this.map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
+    },
+    optionTopographical() {
+      this.map.addOverlayMapTypeId(window.kakao.maps.MapTypeId.TERRAIN);
+    }, 
+    addSetFull(stores, address, bus) {
+      // Setting Option
+      this.optionZoomControl();
+      this.optionTopographical();
+      // About address point
+      this.addMarker(address.lat, address.lng)
+      this.customOverlay_house(address.lat, address.lng)
+      // About stores point
+      stores.forEach((store) => {
+        const {name, lat, lng, distance} = store
+        this.addMarker(lat, lng);
+        this.addLine(address, lat, lng);
+        this.customOverlay(lat, lng, name, distance);
+      });
+      // About bus point
+      bus.forEach((bus) => {
+        const {name, lat, lng, distance} = bus
+        this.addMarker(lat, lng);
+        this.addLine(address, lat, lng, '#29B6F6');
+        this.customOverlay(lat, lng, name, distance);
+      });
+    },
+
+    reMap() {
+      console.log("SUCCESS REMAP");
+      this.loadMap();
+      
+    },
+
   },
 };
 
 </script>
 
-<style scoped>
+<style>
 #map {
   width: 1300px; /* 변경할 너비 값 */
   height: 800px; /* 변경할 높이 값 */
