@@ -2,7 +2,7 @@
   <div>
     <v-container fluid>
       <v-row>
-        <v-col cols="6">
+        <v-col cols="3">
           <!-- 왼쪽 영역에 주소 정보를 감싸는 박스 -->
           <v-card class="pa-3">
             <v-row>
@@ -43,17 +43,12 @@
             <!-- 추가 행 -->
             <v-row>
               <v-col>
-                <v-card color="basil">
+                <v-card color="#272727">
                   <v-card-title class="text-center justify-center py-6">
-                    <h1 class="font-weight-bold text-h2 basil--text">Store</h1>
+                    <h1 class="font-weight-bold text-h2">Store</h1>
                   </v-card-title>
 
-                  <v-tabs
-                    v-model="tab"
-                    background-color="transparent"
-                    color="basil"
-                    grow
-                  >
+                  <v-tabs v-model="tab" background-color="transparent" grow>
                     <v-tab v-for="item in items" :key="item.id">
                       {{ item }}
                     </v-tab>
@@ -61,7 +56,7 @@
 
                   <v-tabs-items v-model="tab">
                     <v-tab-item v-for="item in storeList" :key="item.id">
-                      <v-card color="basil" flat>
+                      <v-card color="#272727" flat>
                         <v-card-text>
                           <v-btn
                             v-for="(btn, index) in item"
@@ -81,8 +76,11 @@
             <!-- 추가 행 -->
             <v-row>
               <v-col>
-                <v-card>
-                  <v-card-title class="text-h6">선택한 Store</v-card-title>
+                <v-card color="#272727">
+                  <v-card-title
+                    class="text-center justify-center font-weight-bold text-h4"
+                    >선택한 Store</v-card-title
+                  >
                   <v-card-text>
                     <div>
                       <v-btn v-for="(button, index) in buttons" :key="index">
@@ -95,6 +93,15 @@
             </v-row>
             <!-- 추가 행 -->
           </v-card>
+          <v-carousel v-model="model">
+            <v-carousel-item v-for="(color, i) in explain.colors" :key="color">
+              <v-sheet :color="color" height="100%" tile>
+                <v-row class="fill-height" align="center" justify="center">
+                  <div class="text-h5">{{ explain.ex[i] }}</div>
+                </v-row>
+              </v-sheet>
+            </v-carousel-item>
+          </v-carousel>
           <v-footer dark padless>
             <v-card flat tile class="indigo lighten-1 white--text text-center">
               <v-card-text>
@@ -111,15 +118,8 @@
               </v-card-text>
 
               <v-card-text class="white--text pt-0">
-                Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit
-                amet. Mauris cursus commodo interdum. Praesent ut risus eget
-                metus luctus accumsan id ultrices nunc. Sed at orci sed massa
-                consectetur dignissim a sit amet dui. Duis commodo vitae velit
-                et faucibus. Morbi vehicula lacinia malesuada. Nulla placerat
-                augue vel ipsum ultrices, cursus iaculis dui sollicitudin.
-                Vestibulum eu ipsum vel diam elementum tempor vel ut orci. Orci
-                varius natoque penatibus et magnis dis parturient montes,
-                nascetur ridiculus mus.
+                If you want contact us, please click. Thank you for using our
+                Service
               </v-card-text>
 
               <v-divider></v-divider>
@@ -130,7 +130,7 @@
             </v-card>
           </v-footer>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="9">
           <!-- 오른쪽 영역 -->
           <v-card class="pa-3" v-if="success_zicbang">
             <v-row>
@@ -186,6 +186,17 @@
             ></v-pagination>
           </v-card>
         </v-col>
+        <v-col col="12">
+          <v-card class="pa-3" color="#272727">
+            <v-row>
+              <v-col>
+                <v-card class="pa-3" outlined>
+                  <kakao-map-dash ref="kakaoMap" />
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
       </v-row>
     </v-container>
   </div>
@@ -194,13 +205,18 @@
 <script>
 import { mapState } from "vuex";
 import axios from "axios";
+import KakaoMap_dash from "@/components/KakaoMap_dash.vue";
 
 export default {
+  components: {
+    "kakao-map-dash": KakaoMap_dash,
+  },
   computed: {
     ...mapState({
       address: (state) => state.address,
       buttons: (state) => state.buttons,
       zickbang_point: (state) => state.zickbang_point,
+      dash_zickbang_source: (state) => state.dash_zickbang_source,
     }),
     visibleItems() {
       if (!this.success_zicbang) return []; // 데이터가 없는 경우 빈 배열 반환
@@ -226,6 +242,12 @@ export default {
 
       this.zicbang_source = dataArray;
       this.success_zicbang = true;
+      this.$nextTick(() => {
+        this.$store.dispatch("setDash_zickbang_source", this.zicbang_source);
+      });
+      this.$nextTick(() => {
+        this.$refs.kakaoMap.reLoadMap(this.dash_zickbang_source);
+      });
       console.log("axios success");
     } catch (error) {
       console.error("Error fetching data", error);
@@ -234,6 +256,15 @@ export default {
 
   data() {
     return {
+      model: 0,
+      explain: {
+        colors: ["secondary", "primary", "yellow darken-2"],
+        ex: [
+          "첫번째 탭에서 세권 조건을 선택해주세요",
+          "Map Rendering을 진행해주세요.",
+          "상세정보 페이지를 볼 수 있어요.",
+        ],
+      },
       currentPage: 1,
       itemsPerPage: 6,
       zicbang_source: [],

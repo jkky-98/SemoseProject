@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container fluid>
-      <v-card class="pa-3">
+      <v-card class="pa-3" color="#272727">
         <v-row>
           <v-col>
             <v-card class="pa-3" outlined>

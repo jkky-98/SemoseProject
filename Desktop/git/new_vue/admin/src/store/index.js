@@ -9,12 +9,16 @@ export default new Vuex.Store({
     buttons: [], // 선택된 버튼 상태 초기값
     zickbang_point: [], // 직방 매물 선택 초기값
     receivedData: {},
+    receivedData_info: {},
+    dash_zickbang_source: [],
   },
   getters: {
     getAddress: (state) => state.address,
     getSelectedButtons: (state) => state.buttons,
     getZickbangPoint: (state) => state.zickbang_point,
     getReceivedData: (state) => state.receivedData,
+    getReceivedData_info: (state) => state.receivedData_info,
+    getDash_zickbang_source: (state) => state.dash_zickbang_source,
   },
   mutations: {
     SET_ZICKBANG_POINT(state, lat_lng) {
@@ -33,6 +37,12 @@ export default new Vuex.Store({
     },
     SET_RECEIVED_DATA(state, receivedData) {
       state.receivedData = receivedData;
+    },
+    SET_RECEIVED_DATA_INFO(state, receivedData_info) {
+      state.receivedData_info = receivedData_info;
+    },
+    SET_DASH_ZICKBANG_SOURCE(state, dash_zickbang_source) {
+      state.dash_zickbang_source = dash_zickbang_source;
     },
   },
   actions: {
@@ -53,6 +63,12 @@ export default new Vuex.Store({
     },
     setReceivedData({ commit }, receivedData) {
       commit("SET_RECEIVED_DATA", receivedData); // mutation을 호출하여 상태 변수 업데이트하는 action
+    },
+    setReceivedData_info({ commit }, receivedData_info) {
+      commit("SET_RECEIVED_INFO_DATA", receivedData_info); // mutation을 호출하여 상태 변수 업데이트하는 action
+    },
+    setDash_zickbang_source({ commit }, dash_zickbang_source) {
+      commit("SET_DASH_ZICKBANG_SOURCE", dash_zickbang_source); // mutation을 호출하여 상태 변수 업데이트하는 action
     },
   },
   modules: {},

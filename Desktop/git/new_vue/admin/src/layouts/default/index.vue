@@ -1,17 +1,13 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="#26293C">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>
         {{ $route.meta.dynamicTitle }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
     </v-app-bar>
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-      src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg"
-    >
+    <v-navigation-drawer v-model="drawer" app color="#26293C">
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="text-h3 white--text">

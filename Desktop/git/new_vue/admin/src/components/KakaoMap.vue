@@ -1,6 +1,8 @@
 <template>
   <div class="map-container">
-    <h2 class="map-title">MAP INFO</h2>
+    <v-card-text class="text-center justify-center font-weight-bold text-h4"
+      >MAP INFO</v-card-text
+    >
     <div id="map"></div>
   </div>
 </template>
@@ -327,12 +329,12 @@ export default {
   display: block; /* 블록 요소로 표시하여 가로폭 전체를 차지하도록 설정 */
 }
 .map-title {
-  color: black;
+  color: white;
 }
 
 .map-container {
-  background-color: #f0f0f0; /* 회색 배경색 설정 */
-  border: 1px solid #ccc; /* 테두리 설정 */
+  background-color: #272727; /* 회색 배경색 설정 */
+  border: 1px solid #272727; /* 테두리 설정 */
   padding: 20px; /* 위 아래 여백 설정 */
   margin-top: 20px; /* 위쪽 간격 설정 */
   margin-bottom: 20px; /* 아래쪽 간격 설정 */
