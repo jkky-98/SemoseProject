@@ -17,4 +17,3 @@ def get_lat_lng_from_address(address, api_key="AIzaSyAGWaw80N-4bPYXLZjtep8SW6Gs5
         return lat, lng
     else:
         return None
-    

@@ -3,7 +3,7 @@ import math
 def haversine(lat1, lon1, lat2, lon2):
     # 지구의 반지름 (킬로미터)
     radius = 6371
-
+    
     # 위도 및 경도를 라디안으로 변환
     lat1 = math.radians(lat1)
     lon1 = math.radians(lon1)
