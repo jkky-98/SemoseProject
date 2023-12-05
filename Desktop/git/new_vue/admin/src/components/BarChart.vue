@@ -57,11 +57,11 @@ export default {
     },
     width: {
       type: Number,
-      default: 400,
+      default: 1000,
     },
     height: {
       type: Number,
-      default: 400,
+      default: 930,
     },
     cssClasses: {
       default: "",
@@ -79,13 +79,42 @@ export default {
   data() {
     return {
       chartOptions: {
-        responsive: false,
-        maintainAspectRatio: false,
-        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: true,
         legend: {
           labels: {
             fontColor: "red",
             fontSize: 18,
+          },
+          color: "white",
+        },
+        indexAxis: "y",
+        scales: {
+          y: {
+            ticks: {
+              color: "white", // y 축의 텍스트 색상을 여기서 변경할 수 있습니다.
+            },
+            title: {
+              display: true,
+              text: "시설",
+              color: "white",
+              font: {
+                size: 10,
+              },
+            },
+          },
+          x: {
+            ticks: {
+              color: "white", // x 축의 텍스트 색상을 여기서 변경할 수 있습니다.
+            },
+            title: {
+              display: true,
+              text: "거리(분)",
+              color: "white",
+              font: {
+                size: 10,
+              },
+            },
           },
         },
       },
@@ -131,7 +160,7 @@ export default {
         labels: infoStore.map((item) => item.name), // 이름
         datasets: [
           {
-            label: "Data One",
+            label: "Your Store List",
             backgroundColor: "#f87979",
             data: infoStore.map((item) => item.distance), // 거리 데이터
           },

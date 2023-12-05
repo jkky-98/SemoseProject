@@ -315,6 +315,7 @@ export default {
       this.$set(this.choose_zickbang, 0, { lat, lng, title });
       this.$store.commit("SET_ZICKBANG_POINT", this.choose_zickbang);
       this.$store.dispatch("clearAddress");
+      this.$forceUpdate();
     },
     formatToLocalTime(dateTimeString) {
       const dateObj = new Date(dateTimeString);

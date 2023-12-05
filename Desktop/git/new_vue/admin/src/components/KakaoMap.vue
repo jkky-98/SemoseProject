@@ -1,10 +1,5 @@
 <template>
-  <div class="map-container">
-    <v-card-text class="text-center justify-center font-weight-bold text-h4"
-      >MAP INFO</v-card-text
-    >
-    <div id="map"></div>
-  </div>
+  <v-card id="map"></v-card>
 </template>
 
 <script>
@@ -67,7 +62,7 @@ export default {
           this.receivedData.address_latlng.lat,
           this.receivedData.address_latlng.lng
         ),
-        level: 3,
+        level: 2,
       };
       this.map = new window.kakao.maps.Map(container, options);
       this.$nextTick(() => {
@@ -93,6 +88,29 @@ export default {
       marker.setMap(this.map);
     },
 
+    addMarkerHouse(lat, lng) {
+      // 마커가 표시될 위치입니다
+      var markerPosition = new window.kakao.maps.LatLng(lat, lng);
+      var imageSrc = "https://cdn-icons-png.flaticon.com/128/4551/4551325.png";
+      var imageSize = new window.kakao.maps.Size(24, 35);
+      var imageOption = { offset: new window.kakao.maps.Point(24, 35) };
+
+      // 마커를 생성합니다
+      var markerImage = new window.kakao.maps.MarkerImage(
+        imageSrc,
+        imageSize,
+        imageOption
+      );
+      var marker = new window.kakao.maps.Marker({
+        position: markerPosition,
+        clickable: true,
+        image: markerImage,
+      });
+
+      // 마커가 지도 위에 표시되도록 설정합니다
+      marker.setMap(this.map);
+    },
+
     addLine(address, lat_end, lng_end, color = "#FFAE00") {
       var linePath = [
         new window.kakao.maps.LatLng(address.lat, address.lng),
@@ -109,7 +127,10 @@ export default {
       polyline.setMap(this.map);
     },
     customOverlay_house(lat, lng) {
-      var iwContent = "당신의 세권 점수 : " + this.receivedData.scorebox.score, // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+      var iwContent =
+          '<div style="color: black;">당신의 세권 점수 : ' +
+          this.receivedData.scorebox.score +
+          "</div>", // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
         iwPosition = new window.kakao.maps.LatLng(lat, lng), //인포윈도우 표시 위치입니다
         iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
 
@@ -135,7 +156,7 @@ export default {
       this.optionZoomControl();
       this.optionTopographical();
       // About address point
-      this.addMarker(address.lat, address.lng);
+      this.addMarkerHouse(address.lat, address.lng);
       this.customOverlay_house(address.lat, address.lng);
       // About stores point
       stores.forEach((store) => {
@@ -161,21 +182,48 @@ export default {
         chunks.push(name.substring(i, i + 10));
       }
       const modifiedName = chunks.join("<br>");
+      const lineNumber = Math.ceil(name.length / 10);
+      const lineExtraHeight = (lineNumber - 1) * 16;
+      const totalHeight = 66 + lineExtraHeight; // 기본 높이 66px에 추가 높이를 더합니다.
+      const infoHeight = 60 + lineExtraHeight; // info의 기본 높이 60px에 추가 높이를 더합니다.
+      document.documentElement.style.setProperty(
+        "--over-wrap-height",
+        `${totalHeight}px`
+      );
+      document.documentElement.style.setProperty(
+        "--over-info-height",
+        `${infoHeight}px`
+      );
+      // const bodyMarginTop = lineExtraHeight; // body의 상단 여백을 추가 높이로 설정합니다.
+      // document.documentElement.style.setProperty('--over-body-margin-top', `${bodyMarginTop}px`);
+      const bodyHeight = 38 + lineExtraHeight; // body의 기본 높이 38px에 추가 높이를 더합니다.
+      const descHeight = 38 + lineExtraHeight; // desc의 기본 높이 38px에 추가 높이를 더합니다.
+      document.documentElement.style.setProperty(
+        "--over-body-height",
+        `${bodyHeight}px`
+      );
+      document.documentElement.style.setProperty(
+        "--over-desc-height",
+        `${descHeight}px`
+      );
+      // const descMarginTop = lineExtraHeight; // desc의 상단 여백을 추가 높이로 설정합니다.
+      // document.documentElement.style.setProperty('--over-desc-margin-top', `${descMarginTop}px`);
+      content.style.height = `${totalHeight}px`; // 오버레이의 높이를 동적으로 조정합니다.
       content.innerHTML = `
-      <div class="over-info">
+      <div class="over-info" style="height: ${infoHeight}px">
         <div class="over-title">
           ${modifiedName}
           <div class="over-close" id="closeBtn" title="닫기" style="right: 5px"></div>
         </div>
-        <div class="over-body">
-          <div class="over-desc">
+        <div class="over-body"> <!-- 줄바꿈이 발생한 경우 margin-top을 제거합니다. -->
+          <div class="over-desc"> <!-- 줄바꿈이 발생한 경우 margin-top을 제거합니다. -->
             <div class="over-ellipsis">${distance}분 거리</div>
             <div class="over-jibun ellipsis">${number}</div>
             <a href="${placeurl}" target="_blank" class="over-link">홈페이지 바로가기</a>
           </div>
         </div>
       </div>
-      `;
+    `;
 
       // X 버튼 추가
       const closeBtn = content.querySelector("#closeBtn");
@@ -346,7 +394,7 @@ export default {
   left: 0;
   bottom: 20px;
   width: auto;
-  height: 66px;
+  height: var(--over-wrap-height, 66px);
   margin-left: -48px;
   text-align: left;
   overflow: hidden;
@@ -358,12 +406,12 @@ export default {
   width: 120px;
   max-height: 60px;
   overflow: auto;
-  height: 60px;
+  height: var(--over-wrap-height, 66px);
   border-radius: 5px;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #272727;
+  border-right: 1px solid #272727;
   overflow: hidden;
-  background: #fff;
+  background: #272727;
   padding: 0;
 }
 .over-info .over-title {
@@ -372,8 +420,8 @@ export default {
   padding: 2px 0 0 3px;
   width: 120px; /* title의 width를 고정값으로 설정합니다. */
   height: auto;
-  background: #eee;
-  border-bottom: 1px solid #ddd;
+  background: #4a95f2;
+  border-bottom: 1px solid #272727;
   font-size: 10px;
   font-weight: bold;
   word-break: break-word; /* 긴 단어가 다음 줄로 넘어가도록 설정합니다. */
@@ -390,11 +438,13 @@ export default {
 .over-info .over-body {
   position: relative;
   overflow: hidden;
+  height: var(--over-body-height, 38px); /* 높이를 변수로 설정합니다. */
+  /* margin-top: var(--over-body-margin-top, 0); 상단 여백을 변수로 설정합니다. */
 }
 .over-info .over-desc {
   position: relative;
-  margin: 1px 0 0 5px;
-  height: 38px;
+  margin: var(--over-desc-margin-top, 1px) 0 0 5px; /* 상단 여백을 변수로 설정합니다. */
+  height: var(--over-desc-height, 38px); /* 높이를 변수로 설정합니다. */
 }
 .over-desc .over-ellipsis {
   overflow: hidden;
@@ -413,8 +463,8 @@ export default {
   left: 2px;
   width: 24px;
   height: 24px;
-  border: 1px solid #ddd;
-  color: #888;
+  border: 1px solid #272727;
+  color: #272727;
   overflow: hidden;
 }
 .over-info:after {
@@ -451,10 +501,10 @@ export default {
   overflow: auto;
   height: 60px;
   border-radius: 5px;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #272727;
+  border-right: 1px solid #272727;
   overflow: hidden;
-  background: #fff;
+  background: #272727;
   padding: 0;
 }
 .bus-info .bus-title {
@@ -463,8 +513,8 @@ export default {
   padding: 2px 0 0 3px;
   width: 120px; /* title의 width를 고정값으로 설정합니다. */
   height: auto;
-  background: #87ceeb;
-  border-bottom: 1px solid #ddd;
+  background: #3fb17d;
+  border-bottom: 1px solid #3fb17d;
   font-size: 10px;
   font-weight: bold;
   word-break: break-word; /* 긴 단어가 다음 줄로 넘어가도록 설정합니다. */

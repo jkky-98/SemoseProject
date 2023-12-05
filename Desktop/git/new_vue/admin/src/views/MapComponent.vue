@@ -8,6 +8,9 @@
               <v-btn color="primary" block @click="postData"
                 >Map Rendering</v-btn
               >
+              <v-card-text class="text-center text-h5 font-weight-bold"
+                >MAP VIEW
+              </v-card-text>
               <kakao-map ref="kakaoMap" />
             </v-card>
           </v-col>

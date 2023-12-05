@@ -1,7 +1,5 @@
 <template>
-  <div class="map-container">
-    <div id="map"></div>
-  </div>
+  <v-card id="map"></v-card>
 </template>
 
 <script>
@@ -11,6 +9,7 @@ export default {
   name: "KakaoMap_dash",
   data() {
     return {
+      choose_zickbang: [{ lat: null, lng: null }],
       scorebox: null,
       address: { name: "my house", lat: 37.0781534, lng: 127.0427976 },
       stores: [
@@ -61,7 +60,7 @@ export default {
       // 맵 기본위치 설정 및 사이즈
       const options = {
         center: new window.kakao.maps.LatLng(37.282972, 127.045545),
-        level: 3,
+        level: 4,
       };
       this.map = new window.kakao.maps.Map(container, options);
       data.forEach((data) => {
@@ -91,14 +90,14 @@ export default {
           manage_cost,
           sales_type
         );
-        this.addMarker(lat, lng);
+        this.addMarker(lat, lng, title);
       });
     },
 
-    addMarker(lat, lng) {
+    addMarker(lat, lng, title) {
       // 마커가 표시될 위치입니다
       var markerPosition = new window.kakao.maps.LatLng(lat, lng);
-      var imageSrc = "@/assets/free-icon-location-pin-8637632.png";
+      var imageSrc = "https://cdn-icons-png.flaticon.com/128/4551/4551325.png";
       var imageSize = new window.kakao.maps.Size(24, 35);
       var imageOption = { offset: new window.kakao.maps.Point(24, 35) };
 
@@ -118,9 +117,9 @@ export default {
       marker.setMap(this.map);
 
       // 마커 클릭 이벤트 리스너를 등록합니다
-      window.kakao.maps.event.addListener(marker, "click", function () {
-        // 마커의 이미지를 변경합니다 (새로운 이미지로 교체하여 마커의 색상을 변경)
-        var newImageSrc = "@/assets/free-icon-location-pointer-2098567.png";
+      window.kakao.maps.event.addListener(marker, "click", () => {
+        var newImageSrc =
+          "https://t1.daumcdn.net/localimg/localimages/07/2018/mw/m640/ico_marker.png";
         var newImageSize = new window.kakao.maps.Size(24, 35);
         var newImageOption = { offset: new window.kakao.maps.Point(24, 35) };
         var newMarkerImage = new window.kakao.maps.MarkerImage(
@@ -129,7 +128,8 @@ export default {
           newImageOption
         );
 
-        marker.setImage(newMarkerImage); // 마커의 이미지를 변경합니다
+        marker.setImage(newMarkerImage);
+        this.settingaddress(lat, lng, title);
       });
     },
     // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
@@ -140,14 +140,21 @@ export default {
     optionTopographical() {
       this.map.addOverlayMapTypeId(window.kakao.maps.MapTypeId.TERRAIN);
     },
+    settingaddress(lat, lng, title) {
+      // Vuex store에 값을 저장합니다.
+      this.$set(this.choose_zickbang, 0, { lat, lng, title });
+      this.$store.commit("SET_ZICKBANG_POINT", this.choose_zickbang);
+      this.$store.dispatch("clearAddress");
+      this.$forceUpdate();
+    },
   },
 };
 </script>
 
 <style>
 #map {
-  width: 1200px; /* 지도의 크기 지정 */
-  height: 800px;
+  width: 100%; /* 지도의 크기 지정 */
+  height: 100%;
   margin: auto; /* 가운데 정렬을 위한 margin 속성 */
   display: block; /* 블록 요소로 표시하여 가로폭 전체를 차지하도록 설정 */
 }

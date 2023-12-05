@@ -19,6 +19,15 @@ export default new Vuex.Store({
     getReceivedData: (state) => state.receivedData,
     getReceivedData_info: (state) => state.receivedData_info,
     getDash_zickbang_source: (state) => state.dash_zickbang_source,
+    getMyOnerooms: (state) => (value) => {
+      if (!state.receivedData_info || !state.receivedData_info.oneroom_all) {
+        return [];
+      }
+
+      return state.receivedData_info.oneroom_all.filter(
+        (item) => item.my === value
+      );
+    },
   },
   mutations: {
     SET_ZICKBANG_POINT(state, lat_lng) {
@@ -69,6 +78,9 @@ export default new Vuex.Store({
     },
     setDash_zickbang_source({ commit }, dash_zickbang_source) {
       commit("SET_DASH_ZICKBANG_SOURCE", dash_zickbang_source); // mutation을 호출하여 상태 변수 업데이트하는 action
+    },
+    clearRecievedData_info({ commit }) {
+      commit("SET_RECEIVED_INFO_DATA", {});
     },
   },
   modules: {},
