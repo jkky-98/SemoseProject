@@ -44,6 +44,7 @@ export default {
     async postData() {
       try {
         let dataToSend = null;
+        const startTime = performance.now();
         console.log(this.myAddress);
         console.log(this.zickbang_point);
 
@@ -86,6 +87,9 @@ export default {
         this.$store.commit("SET_RECEIVED_DATA", processedData);
         console.log("postthen vuex 저장 완료");
         this.$refs.kakaoMap.reLoadMap();
+        const endTime = performance.now(); // 요청 완료 시간 기록
+        const duration = endTime - startTime; // 요청 처리 시간 계산 (밀리초 단위)
+        console.log(`Axios 요청 처리 시간: ${duration}ms`);
       } catch (error) {
         console.error(error.message);
         // 에러 메시지 처리 등
